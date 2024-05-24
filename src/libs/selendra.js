@@ -1,5 +1,8 @@
 import { defineChain } from "viem";
 
+export const mainnetStr = "https://rpc0.selendra.org";
+export const testnetStr = "https://rpc0-testnet.selendra.org";
+
 export const testnet = defineChain({
 	id: 1953,
 	name: "Selendra Network Testnet",

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const jobStatuses = ["queued", "submitted", "completed"];
+const jobStatuses = ["queued", "submitted", "approved", "executed"];
 
 const JobSchema = new mongoose.Schema(
 	{
@@ -14,6 +14,9 @@ const JobSchema = new mongoose.Schema(
 			required: true,
 			enum: jobStatuses,
 			default: "queued",
+		},
+		txHash: {
+			type: String,
 		},
 	},
 	{
@@ -32,7 +35,7 @@ export async function createJob({ txId }) {
 		throw new Error("Transaction already submitted");
 	}
 
-	return await new JOB({ txId }).save().toObject();
+	return await new JOB({ txId }).save();
 }
 
 export async function updateJob({ txId, status }) {
@@ -46,9 +49,20 @@ export async function updateJob({ txId, status }) {
 		throw new Error("Invalid status");
 	}
 
-	return await JOB.findOneAndUpdate({ txId }, { status }).toObject();
+	return await JOB.findOneAndUpdate({ txId }, { status });
 }
 
-export async function getPendingJobs() {
-	return await JOB.find({ status: "queued" }).toObject();
+export async function getPendingQueueJobs() {
+	const results = await JOB.find({ status: "queued" });
+	return results.map((res) => res.toObject());
+}
+
+export async function getPendingSubmittedJobs() {
+	const results = await JOB.find({ status: "submitted" });
+	return results.map((res) => res.toObject());
+}
+
+export async function getPendingApprovedJobs() {
+	const results = await JOB.find({ status: "approved" });
+	return results.map((res) => res.toObject());
 }
